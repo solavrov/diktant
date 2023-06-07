@@ -70,7 +70,7 @@ function getGrade(stat) {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = ref(getStorage(app));
+const storage = getStorage(app);
 
 let glob = {
     db: {},
