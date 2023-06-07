@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Diktant</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            
+            #loader {
+                visibility: visible;
+                border: 10px solid gray;
+                border-radius: 50%;
+                border-top: 10px solid gray;
+                border-bottom: 10px solid white;
+                width: 40px;
+                height: 40px;
+                animation: spin 1s linear infinite;
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+            }
+            
+            @keyframes spin {
+                100% {
+                    transform: rotate(360deg);
+                }
+            }
+            
+            h1 {
+                text-align: center;
+                font-family: monospace;
+/*                font-size: 36px;*/
+            }
+            
+            table.main {
+                width: 0px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+                        
+            #select, #buttonRead, #buttonWrite {
+                visibility: hidden;
+                font-family: monospace;
+                font-size: 14px;
+            }
+            
+            #input {
+                width: 100%;
+                height: 220px;
+                padding: 12px 20px;
+                margin-top: 10px;
+                box-sizing: border-box;
+                border: 2px solid #ccc;
+                border-radius: 4px;
+                background-color: #f8f8f8;
+                font-size: 14px;
+                font-family: monospace;
+                resize: none;
+                display: none;
+            }
+            
+            #output {
+                width: 100%;
+                padding: 12px 20px;
+                margin-top: 10px;
+                box-sizing: border-box;
+                border: 2px solid #ccc;
+                border-radius: 4px;
+                background-color: #f8f8f8;
+                font-size: 14px;
+                font-family: monospace;
+                text-align: justify;
+                display: none;
+            }
+            
+            #buttonCheck {
+                display: none; 
+                margin-left: auto;
+                margin-right: auto;
+                font-family: monospace;
+                font-size: 14px;
+            }
+            
+            table.stat {
+                border-collapse: collapse;
+                margin-top: 10px;
+                width: 100%;
+                font-size: 14px;
+                font-family: monospace;
+/*                color: blue;*/
+                display: none;
+            }
+            
+/*            td, th {
+                border: 1px solid black;
+            }*/
+
+            td.grade {
+               text-align: center;
+               color: red;
+               font-size: 50px;
+               font-family: Arial, sans-serif;
+            }
+            
+
+        </style>
+    </head>
+    <body>
+        <div id="loader"></div>
+        <h1>Диктант v0.6</h1>
+        <table class="main">
+            <tr>
+                <td>
+                    <select id="select"></select>
+                </td>
+                <td>
+                    <button id="buttonRead">Читать</button>
+                </td>
+                <td>
+                    <button id="buttonWrite">Писать</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <textarea id="input" spellcheck="false"></textarea>
+                    <div id="output"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <button id="buttonCheck">Проверить</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <table id="stat" class="stat">
+                        <tr>
+                            <td style="width: 36%">Слов с ошибками:</td>
+                            <td style="width: 6%" id="wordWrong">0</td>
+                            <td rowspan="4" class="grade" id="grade">5</td>
+                        </tr>
+                        <tr>
+                            <td>Пропущенных знаков:</td>
+                            <td id="markMiss">0</td>
+                        </tr>
+                        <tr>
+                            <td>Лишних знаков:</td>
+                            <td  id="markWaste">0</td>
+                        </tr>
+                        <tr>
+                            <td>Пропущенных слов:</td>
+                            <td id="wordMiss">0</td>
+                        </tr>
+                        <tr>
+                            <td>Лишних слов:</td>
+                            <td id="wordWaste">0</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        
+                
+        <script type="module" src="main.js"></script>
+    </body>
+</html>
