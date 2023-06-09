@@ -15,6 +15,8 @@ const firebaseConfig = {
   measurementId: "G-ZP4BM4CFHD"
 };
 
+const CHOOSE_DICT = "--------------- Выберите диктант ------------";
+
 function getKeyByValue(object, value) {
   return Object.keys(object).find(key => object[key] === value);
 }
@@ -108,6 +110,7 @@ for (const e of glob.dictNames) {
     glob.dictList.push(e.name);
 }
 glob.dictList.sort();
+glob.dictList.unshift(CHOOSE_DICT);
 
 function getAudio(name) {
     for (const e of glob.dictNames) {
@@ -138,6 +141,15 @@ glob.html.input.style.display = "block";
 glob.html.buttonCheck.style.display = "block";
 
 glob.html.select.addEventListener("change", function() {
+    if (glob.html.select.value === CHOOSE_DICT) {
+        glob.html.buttonPlay.disabled = true;
+        glob.html.buttonPause.disabled = true;
+        glob.html.buttonCheck.disabled = true;
+    } else {
+        glob.html.buttonPlay.disabled = false;
+        glob.html.buttonPause.disabled = false;
+        glob.html.buttonCheck.disabled = false;
+    }
     glob.html.output.innerHTML = "";
     glob.html.output.style.display = "none";
     glob.html.input.value = "";
