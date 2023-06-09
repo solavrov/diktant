@@ -40,8 +40,13 @@
                 margin-left: auto;
                 margin-right: auto;
             }
+            
+            #progressBar {
+                width: 100%;
+                visibility: hidden;
+            }
                         
-            #select, #buttonRead, #buttonWrite {
+            #select, #buttonPlay, #buttonPause {
                 visibility: hidden;
                 font-family: monospace;
                 font-size: 14px;
@@ -110,17 +115,22 @@
     </head>
     <body>
         <div id="loader"></div>
-        <h1>Диктант v0.6</h1>
+        <h1>Диктант v0.1.0</h1>
         <table class="main">
             <tr>
                 <td>
                     <select id="select"></select>
                 </td>
                 <td>
-                    <button id="buttonRead">Читать</button>
+                    <button id="buttonPlay">&#9654</button>
                 </td>
                 <td>
-                    <button id="buttonWrite">Писать</button>
+                    <button id="buttonPause">&#10074;&#10074;</button>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <progress id="progressBar" value="0" max="100"></progress>
                 </td>
             </tr>
             <tr>
@@ -138,7 +148,7 @@
                 <td colspan="3">
                     <table id="stat" class="stat">
                         <tr>
-                            <td style="width: 36%">Слов с ошибками:</td>
+                            <td style="width: 44%">Слов с ошибками:</td>
                             <td style="width: 6%" id="wordWrong">0</td>
                             <td rowspan="4" class="grade" id="grade">5</td>
                         </tr>

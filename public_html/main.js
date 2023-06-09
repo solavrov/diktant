@@ -15,19 +15,21 @@ const firebaseConfig = {
   measurementId: "G-ZP4BM4CFHD"
 };
 
-async function queryDoc(document) {
-    const snap = await getDoc(document);
-    const data = snap.data();
+function getKeyByValue(object, value) {
+  return Object.keys(object).find(key => object[key] === value);
+}
+
+async function getCol(col) {
+    const snap = await getDocs(col);
     let result = [];
-    for (let key in data) {
-        result.push(data[key]);
-    }
-    result.sort();
+    snap.forEach((doc) => {
+        result.push(doc.data());
+    });
     return result;
 }
 
-async function queryCol(collection, queryField, value, returnField) {
-    const q = query(collection, where(queryField, "==", value));
+async function queryCol(col, queryField, value, returnField) {
+    const q = query(col, where(queryField, "==", value));
     const snap = await getDocs(q);
     let result = [];
     snap.forEach((doc) => {
@@ -75,16 +77,18 @@ const storage = getStorage(app);
 let glob = {
     db: {},
     html: {},
-    dictNames: []
+    dictNames: [],
+    dictList: []
 };
 
-glob.db.dicts = collection(db, "dicts");
-glob.db.all = doc(db, "dicts", "all");
+glob.db.texts = collection(db, "texts");
+glob.db.names = collection(db, "names");
 
 glob.html.loader = document.getElementById("loader");
 glob.html.select = document.getElementById("select");
-glob.html.buttonRead = document.getElementById("buttonRead");
-glob.html.buttonWrite = document.getElementById("buttonWrite");
+glob.html.buttonPlay = document.getElementById("buttonPlay");
+glob.html.buttonPause = document.getElementById("buttonPause");
+glob.html.progressBar = document.getElementById("progressBar");
 glob.html.buttonCheck = document.getElementById("buttonCheck");
 glob.html.output = document.getElementById("output");
 glob.html.input = document.getElementById("input");
@@ -95,11 +99,31 @@ glob.html.markWaste = document.getElementById("markWaste");
 glob.html.wordMiss = document.getElementById("wordMiss");
 glob.html.wordWaste = document.getElementById("wordWaste");
 glob.html.grade = document.getElementById("grade");
+glob.html.audio = document.createElement("audio");
 
-glob.dictNames = await queryDoc(glob.db.all);
+glob.dictNames = await getCol(glob.db.names);
 glob.html.loader.style.visibility = "hidden";
 
-for (let name of glob.dictNames){
+for (const e of glob.dictNames) {
+    glob.dictList.push(e.name);
+}
+glob.dictList.sort();
+
+function getAudio(name) {
+    for (const e of glob.dictNames) {
+        if (e.name === name) return e.audio;
+    }
+    return "";
+}
+
+function stopAudio() {
+    glob.html.audio.pause();
+    glob.html.audio.removeAttribute("src");
+    glob.html.audio.load();
+    glob.html.progressBar.value = 0;
+}
+
+for (let name of glob.dictList){
     let opt = document.createElement("option");
     opt.value = name;
     opt.innerHTML = name;
@@ -107,45 +131,53 @@ for (let name of glob.dictNames){
 }
 
 glob.html.select.style.visibility = "visible";
-glob.html.buttonRead.style.visibility = "visible";
-glob.html.buttonWrite.style.visibility = "visible";
+glob.html.buttonPlay.style.visibility = "visible";
+glob.html.buttonPause.style.visibility = "visible";
+glob.html.progressBar.style.visibility = "visible";
+glob.html.input.style.display = "block";
+glob.html.buttonCheck.style.display = "block";
 
 glob.html.select.addEventListener("change", function() {
     glob.html.output.innerHTML = "";
     glob.html.output.style.display = "none";
     glob.html.input.value = "";
-    glob.html.input.style.display = "none";
-    glob.html.buttonCheck.style.display = "none";
+    glob.html.input.style.display = "block";
+    glob.html.buttonCheck.style.display = "block";
     glob.html.stat.style.display = "none";
+    stopAudio();
 });
 
-glob.html.buttonRead.addEventListener("click", async function() {
-    glob.html.buttonRead.disabled = true;
-    glob.html.buttonWrite.disabled = true;
-    glob.html.input.style.display = "none";
-    glob.html.buttonCheck.style.display = "none";
-    glob.html.stat.style.display = "none";
-    glob.html.loader.style.visibility = "visible";
-    glob.html.output.innerHTML = await queryCol(glob.db.dicts, "name", glob.html.select.value, "text");
-    glob.html.loader.style.visibility = "hidden";
-    glob.html.output.style.display = "block";
-    glob.html.buttonRead.disabled = false;
-    glob.html.buttonWrite.disabled = false;
+glob.html.buttonPause.addEventListener("click", async function() {
+    glob.html.audio.pause();
 });
 
-glob.html.buttonWrite.addEventListener("click", function() {
+glob.html.buttonPlay.addEventListener("click", async function() {
     glob.html.output.style.display = "none";
     glob.html.stat.style.display = "none";
     glob.html.input.value = "";
     glob.html.input.style.display = "block";
     glob.html.buttonCheck.style.display = "block";
+    const url = await getDownloadURL(ref(storage, getAudio(glob.html.select.value)));
+    if (!glob.html.audio.hasAttribute("src")) {
+        glob.html.audio.setAttribute("src", url);
+        glob.html.audio.currentTime = 0;
+    }
+    glob.html.audio.play();
+});
+
+glob.html.audio.addEventListener("timeupdate", function() {
+   if (glob.html.audio.hasAttribute("src")) {
+       glob.html.progressBar.value = 
+               Math.round((glob.html.audio.currentTime / glob.html.audio.duration) * 100); 
+   }
 });
 
 glob.html.buttonCheck.addEventListener("click", async function() {
+    stopAudio();
     glob.html.loader.style.visibility = "visible";
-    const ref = await queryCol(glob.db.dicts, "name", glob.html.select.value, "text");
-    const text = glob.html.input.value;
-    const t = new TextCf(text, ref);
+    const refText = await queryCol(glob.db.texts, "name", glob.html.select.value, "text");
+    const inputText = glob.html.input.value;
+    const t = new TextCf(inputText, refText);
     glob.html.output.innerHTML = t.html();
     const stat = t.stat();
     glob.html.wordWrong.innerHTML = stat.wordWrong;
