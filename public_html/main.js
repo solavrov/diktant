@@ -147,7 +147,7 @@ glob.html.select.addEventListener("change", function() {
         glob.html.buttonCheck.disabled = true;
     } else {
         glob.html.buttonPlay.disabled = false;
-        glob.html.buttonPause.disabled = false;
+        glob.html.buttonPause.disabled = true;
         glob.html.buttonCheck.disabled = false;
     }
     glob.html.output.innerHTML = "";
@@ -161,12 +161,16 @@ glob.html.select.addEventListener("change", function() {
 
 glob.html.buttonPause.addEventListener("click", async function() {
     glob.html.audio.pause();
+    glob.html.buttonPlay.disabled = false;
+    glob.html.buttonPause.disabled = true;
 });
 
 glob.html.buttonPlay.addEventListener("click", async function() {
+    glob.html.buttonPlay.disabled = true;
+    glob.html.buttonPause.disabled = false;
     glob.html.output.style.display = "none";
     glob.html.stat.style.display = "none";
-    glob.html.input.value = "";
+    //glob.html.input.value = "";
     glob.html.input.style.display = "block";
     glob.html.buttonCheck.style.display = "block";
     const url = await getDownloadURL(ref(storage, getAudio(glob.html.select.value)));
@@ -180,12 +184,17 @@ glob.html.buttonPlay.addEventListener("click", async function() {
 glob.html.audio.addEventListener("timeupdate", function() {
    if (glob.html.audio.hasAttribute("src")) {
        glob.html.progressBar.value = 
-               Math.round((glob.html.audio.currentTime / glob.html.audio.duration) * 100); 
+               Math.round((glob.html.audio.currentTime / glob.html.audio.duration) * 100);
+       if (glob.html.audio.currentTime === glob.html.audio.duration) {
+           glob.html.buttonPause.disabled = true;
+       }
    }
 });
 
 glob.html.buttonCheck.addEventListener("click", async function() {
     stopAudio();
+    glob.html.buttonPlay.disabled = true;
+    glob.html.buttonPause.disabled = true;
     glob.html.loader.style.visibility = "visible";
     const refText = await queryCol(glob.db.texts, "name", glob.html.select.value, "text");
     const inputText = glob.html.input.value;
@@ -203,5 +212,6 @@ glob.html.buttonCheck.addEventListener("click", async function() {
     glob.html.input.style.display = "none";
     glob.html.output.style.display = "block";
     glob.html.stat.style.display = "table";
+    glob.html.buttonPlay.disabled = false;
 });
 
