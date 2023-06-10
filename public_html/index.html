@@ -35,19 +35,22 @@
 /*                font-size: 36px;*/
             }
             
-            table.main {
+            #mainTab {
                 width: 0px;
                 margin-left: auto;
                 margin-right: auto;
+                visibility: hidden;
+            }
+            
+            td#mainTab {
+                text-align: center;
             }
             
             #progressBar {
                 width: 100%;
-                visibility: hidden;
             }
                         
             #select, #buttonPlay, #buttonPause {
-                visibility: hidden;
                 font-family: monospace;
                 font-size: 14px;
             }
@@ -64,7 +67,6 @@
                 font-size: 14px;
                 font-family: monospace;
                 resize: none;
-                display: none;
             }
             
             #output {
@@ -82,21 +84,22 @@
             }
             
             #buttonCheck {
-                display: none; 
-                margin-left: auto;
-                margin-right: auto;
+                margin: auto;
                 font-family: monospace;
                 font-size: 14px;
             }
             
-            table.stat {
+            
+            #statTab {
                 border-collapse: collapse;
                 margin-top: 10px;
                 width: 100%;
                 font-size: 14px;
                 font-family: monospace;
-/*                color: blue;*/
                 display: none;
+            }
+            
+            #timer {
             }
             
 /*            td, th {
@@ -110,13 +113,17 @@
                font-family: Arial, sans-serif;
             }
             
+            .textCenter {
+               text-align: center; 
+            }
+            
 
         </style>
     </head>
     <body>
         <div id="loader"></div>
         <h1>Диктант v0.1.0</h1>
-        <table class="main">
+        <table id="mainTab">
             <tr>
                 <td>
                     <select id="select"></select>
@@ -129,9 +136,10 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="3">
+                <td>
                     <progress id="progressBar" value="0" max="100"></progress>
                 </td>
+                <td colspan="2" id="timer" class="textCenter">123</td>
             </tr>
             <tr>
                 <td colspan="3">
@@ -140,13 +148,13 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="3">
+                <td colspan="3" class="textCenter">
                     <button disabled id="buttonCheck">Проверить</button>
                 </td>
             </tr>
             <tr>
                 <td colspan="3">
-                    <table id="stat" class="stat">
+                    <table id="statTab">
                         <tr>
                             <td style="width: 44%">Слов с ошибками:</td>
                             <td style="width: 6%" id="wordWrong">0</td>

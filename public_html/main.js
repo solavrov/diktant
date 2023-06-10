@@ -87,6 +87,7 @@ glob.db.texts = collection(db, "texts");
 glob.db.names = collection(db, "names");
 
 glob.html.loader = document.getElementById("loader");
+glob.html.mainTab = document.getElementById("mainTab");
 glob.html.select = document.getElementById("select");
 glob.html.buttonPlay = document.getElementById("buttonPlay");
 glob.html.buttonPause = document.getElementById("buttonPause");
@@ -94,7 +95,7 @@ glob.html.progressBar = document.getElementById("progressBar");
 glob.html.buttonCheck = document.getElementById("buttonCheck");
 glob.html.output = document.getElementById("output");
 glob.html.input = document.getElementById("input");
-glob.html.stat = document.getElementById("stat");
+glob.html.statTab = document.getElementById("statTab");
 glob.html.wordWrong = document.getElementById("wordWrong");
 glob.html.markMiss = document.getElementById("markMiss");
 glob.html.markWaste = document.getElementById("markWaste");
@@ -105,6 +106,7 @@ glob.html.audio = document.createElement("audio");
 
 glob.dictNames = await getCol(glob.db.names);
 glob.html.loader.style.visibility = "hidden";
+glob.html.mainTab.style.visibility = "visible";
 
 for (const e of glob.dictNames) {
     glob.dictList.push(e.name);
@@ -133,13 +135,6 @@ for (let name of glob.dictList){
     glob.html.select.appendChild(opt);
 }
 
-glob.html.select.style.visibility = "visible";
-glob.html.buttonPlay.style.visibility = "visible";
-glob.html.buttonPause.style.visibility = "visible";
-glob.html.progressBar.style.visibility = "visible";
-glob.html.input.style.display = "block";
-glob.html.buttonCheck.style.display = "block";
-
 glob.html.select.addEventListener("change", function() {
     if (glob.html.select.value === CHOOSE_DICT) {
         glob.html.buttonPlay.disabled = true;
@@ -155,7 +150,7 @@ glob.html.select.addEventListener("change", function() {
     glob.html.input.value = "";
     glob.html.input.style.display = "block";
     glob.html.buttonCheck.style.display = "block";
-    glob.html.stat.style.display = "none";
+    glob.html.statTab.style.display = "none";
     stopAudio();
 });
 
@@ -169,8 +164,7 @@ glob.html.buttonPlay.addEventListener("click", async function() {
     glob.html.buttonPlay.disabled = true;
     glob.html.buttonPause.disabled = false;
     glob.html.output.style.display = "none";
-    glob.html.stat.style.display = "none";
-    //glob.html.input.value = "";
+    glob.html.statTab.style.display = "none";
     glob.html.input.style.display = "block";
     glob.html.buttonCheck.style.display = "block";
     const url = await getDownloadURL(ref(storage, getAudio(glob.html.select.value)));
@@ -211,7 +205,7 @@ glob.html.buttonCheck.addEventListener("click", async function() {
     glob.html.buttonCheck.style.display = "none";
     glob.html.input.style.display = "none";
     glob.html.output.style.display = "block";
-    glob.html.stat.style.display = "table";
+    glob.html.statTab.style.display = "table";
     glob.html.buttonPlay.disabled = false;
 });
 
