@@ -92,6 +92,7 @@ glob.html.select = document.getElementById("select");
 glob.html.buttonPlay = document.getElementById("buttonPlay");
 glob.html.buttonPause = document.getElementById("buttonPause");
 glob.html.progressBar = document.getElementById("progressBar");
+glob.html.timer = document.getElementById("timer");
 glob.html.buttonCheck = document.getElementById("buttonCheck");
 glob.html.output = document.getElementById("output");
 glob.html.input = document.getElementById("input");
@@ -123,7 +124,6 @@ function getAudio(name) {
 
 function stopAudio() {
     glob.html.audio.pause();
-    glob.html.audio.removeAttribute("src");
     glob.html.audio.load();
     glob.html.progressBar.value = 0;
 }
@@ -135,23 +135,26 @@ for (let name of glob.dictList){
     glob.html.select.appendChild(opt);
 }
 
-glob.html.select.addEventListener("change", function() {
+glob.html.select.addEventListener("change", async function() {
+    stopAudio();
     if (glob.html.select.value === CHOOSE_DICT) {
         glob.html.buttonPlay.disabled = true;
-        glob.html.buttonPause.disabled = true;
         glob.html.buttonCheck.disabled = true;
     } else {
         glob.html.buttonPlay.disabled = false;
-        glob.html.buttonPause.disabled = true;
         glob.html.buttonCheck.disabled = false;
+        const url = await getDownloadURL(ref(storage, getAudio(glob.html.select.value)));
+        glob.html.audio.setAttribute("src", url);
+        glob.html.audio.currentTime = 0;
     }
+    glob.html.buttonPause.disabled = true;
+    glob.html.timer.innerHTML = "";
     glob.html.output.innerHTML = "";
     glob.html.output.style.display = "none";
     glob.html.input.value = "";
     glob.html.input.style.display = "block";
     glob.html.buttonCheck.style.display = "block";
     glob.html.statTab.style.display = "none";
-    stopAudio();
 });
 
 glob.html.buttonPause.addEventListener("click", async function() {
@@ -160,18 +163,13 @@ glob.html.buttonPause.addEventListener("click", async function() {
     glob.html.buttonPause.disabled = true;
 });
 
-glob.html.buttonPlay.addEventListener("click", async function() {
+glob.html.buttonPlay.addEventListener("click", function() {
     glob.html.buttonPlay.disabled = true;
     glob.html.buttonPause.disabled = false;
     glob.html.output.style.display = "none";
     glob.html.statTab.style.display = "none";
     glob.html.input.style.display = "block";
     glob.html.buttonCheck.style.display = "block";
-    const url = await getDownloadURL(ref(storage, getAudio(glob.html.select.value)));
-    if (!glob.html.audio.hasAttribute("src")) {
-        glob.html.audio.setAttribute("src", url);
-        glob.html.audio.currentTime = 0;
-    }
     glob.html.audio.play();
 });
 
@@ -179,11 +177,19 @@ glob.html.audio.addEventListener("timeupdate", function() {
    if (glob.html.audio.hasAttribute("src")) {
        glob.html.progressBar.value = 
                Math.round((glob.html.audio.currentTime / glob.html.audio.duration) * 100);
+        const t = Math.round(glob.html.audio.duration - glob.html.audio.currentTime);        
+        glob.html.timer.innerHTML = new Date(t * 1000).toISOString().slice(14, 19);
        if (glob.html.audio.currentTime === glob.html.audio.duration) {
            glob.html.buttonPause.disabled = true;
        }
    }
 });
+
+glob.html.audio.addEventListener("loadedmetadata", function() {
+    const t = Math.round(glob.html.audio.duration);
+    glob.html.timer.innerHTML = new Date(t * 1000).toISOString().slice(14, 19);
+});
+
 
 glob.html.buttonCheck.addEventListener("click", async function() {
     stopAudio();
@@ -201,9 +207,11 @@ glob.html.buttonCheck.addEventListener("click", async function() {
     glob.html.wordMiss.innerHTML = stat.wordMiss;
     glob.html.wordWaste.innerHTML = stat.wordWaste;
     glob.html.grade.innerHTML = getGrade(stat);
+    glob.html.timer.innerHTML = "";
     glob.html.loader.style.visibility = "hidden";
     glob.html.buttonCheck.style.display = "none";
     glob.html.input.style.display = "none";
+    glob.html.input.value = "";
     glob.html.output.style.display = "block";
     glob.html.statTab.style.display = "table";
     glob.html.buttonPlay.disabled = false;
