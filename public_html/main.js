@@ -124,7 +124,7 @@ function getAudio(name) {
 
 function stopAudio() {
     glob.html.audio.pause();
-    glob.html.audio.load();
+    //glob.html.audio.load();
     glob.html.progressBar.value = 0;
 }
 
@@ -174,9 +174,9 @@ glob.html.buttonPlay.addEventListener("click", function() {
 });
 
 glob.html.audio.addEventListener("timeupdate", function() {
-   if (glob.html.audio.hasAttribute("src")) {
+   if (!glob.html.audio.paused) {
        glob.html.progressBar.value = 
-               Math.round((glob.html.audio.currentTime / glob.html.audio.duration) * 100);
+               Math.ceil((glob.html.audio.currentTime / glob.html.audio.duration) * 100);
         const t = Math.round(glob.html.audio.duration - glob.html.audio.currentTime);        
         glob.html.timer.innerHTML = new Date(t * 1000).toISOString().slice(14, 19);
        if (glob.html.audio.currentTime === glob.html.audio.duration) {
@@ -186,10 +186,11 @@ glob.html.audio.addEventListener("timeupdate", function() {
 });
 
 glob.html.audio.addEventListener("loadedmetadata", function() {
-    const t = Math.round(glob.html.audio.duration);
-    glob.html.timer.innerHTML = new Date(t * 1000).toISOString().slice(14, 19);
+    if (glob.html.select.value !== CHOOSE_DICT) {
+        const t = Math.round(glob.html.audio.duration);
+        glob.html.timer.innerHTML = new Date(t * 1000).toISOString().slice(14, 19);
+    }
 });
-
 
 glob.html.buttonCheck.addEventListener("click", async function() {
     stopAudio();
